@@ -56,7 +56,7 @@ var InitCurrentInit = React.createClass({displayName: 'InitCurrentInit',displayn
     }).isRequired,
     characters: React.PropTypes.arrayOf(
       React.PropTypes.shape({
-        key: React.PropTypes.string.isRequired,
+        key: React.PropTypes.number.isRequired,
         name: React.PropTypes.string.isRequired,
         type: React.PropTypes.oneOf(["PC", "NPC", "ENEMY"]).isRequired,
         tags: React.PropTypes.object.isRequired,
@@ -105,7 +105,7 @@ var InitTable = React.createClass({displayName: 'InitTable',
     }).isRequired,
     characters: React.PropTypes.arrayOf(
       React.PropTypes.shape({
-        key: React.PropTypes.string.isRequired,
+        key: React.PropTypes.number.isRequired,
         name: React.PropTypes.string.isRequired,
         type: React.PropTypes.oneOf(["PC", "NPC", "ENEMY"]).isRequired,
         tags: React.PropTypes.object.isRequired,
@@ -132,7 +132,7 @@ var InitTable = React.createClass({displayName: 'InitTable',
 var InitRow = React.createClass({displayName: 'InitRow',
   propTypes: {
     data: React.PropTypes.shape({
-      key: React.PropTypes.string.isRequired,
+      key: React.PropTypes.number.isRequired,
       name: React.PropTypes.string.isRequired,
       type: React.PropTypes.oneOf(["PC", "NPC", "ENEMY"]).isRequired,
       tags: React.PropTypes.object.isRequired,

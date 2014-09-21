@@ -8,6 +8,13 @@ var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 
+app.set('view engine', 'ejs');
+app.get('/r/:roomName/', function(req, res) {
+  res.render('room', { roomName: req.params.roomName })
+});
+app.get('/gm/:roomName/', function(req, res) {
+  res.render('gm', { roomName: req.params.roomName })
+});
 app.use(express.static('public'));
 
 var rm = new RoomManager();

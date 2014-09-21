@@ -117,22 +117,66 @@ var InitGMCharacterInfo = React.createClass({displayName: 'InitGMCharacterInfo',
   propTypes: {
     socket: React.PropTypes.object.isRequired,
   },
+  getInitialState: function() {
+    return {
+      involvedOnly: false,
+    };
+  },
   onAddCharacter: function(e) {
     this.props.socket.emit('addCharacter');
   },
   onRollInit: function(e) {
     this.props.socket.emit('rollInit');
   },
+  onInvolvedOnlyChange: function(e) {
+    this.setState({
+      involvedOnly: e.target.checked,
+    });
+  },
+  onSortInitChange: function(e) {
+    this.setState({
+      sortInit: e.target.checked,
+    });
+  },
   render: function() {
-    var rows = [];
+    var chars = [];
     for (var key in this.props.characters) {
+      if (!this.state.involvedOnly || this.props.characters[key].involved) {
+        chars.push(this.props.characters[key]);
+      }
+    }
+    if (this.state.sortInit) {
+      chars = chars.sort(function (a, b) {
+        if (a.initRoll + a.initBonus != b.initRoll + b.initBonus) {
+          return (b.initRoll + b.initBonus) - (a.initRoll + a.initBonus);
+        }
+
+        if (a.initBonus != b.initBonus) {
+          return b.initBonus - a.initBonus;
+        }
+
+        return b.initRand - a.initRand;
+      });
+
+      if (this.props.room.currentChar != null) {
+        for (var i = 0; i < chars.length; i++) {
+          if (this.props.room.currentChar == chars[i].key) {
+            chars = chars.slice(i).concat(chars.slice(0,i));
+          }
+        }
+      }
+    }
+    var rows = [];
+    for (var i = 0; i < chars.length; i++) {
       rows.push(
-        <InitGMCharacterRow socket={this.props.socket} data={this.props.characters[key]} key={key} />
+        <InitGMCharacterRow socket={this.props.socket} data={chars[i]} key={chars[i].key} />
       );
     }
     return <div id="gmCharacterInfo">
       <button onClick={this.onAddCharacter}>Add Character</button>
       <button onClick={this.onRollInit}>Roll Init</button>
+      <label>Show Involved Only<input type="checkbox" onChange={this.onInvolvedOnlyChange} checked={this.state.involvedOnly} /></label>
+      <label>Sort Characters<input type="checkbox" onChange={this.onSortInitChange} checked={this.state.sortInit} /></label>
       <table>
         <tr>
           <th>Name</th>
@@ -178,7 +222,7 @@ var InitGMCharacterRow = React.createClass({displayName: 'InitGMCharacterRow',
       showDamage: React.PropTypes.bool,
       showHP: React.PropTypes.bool
     }).isRequired,
-    key: React.PropTypes.string.isRequired
+    key: React.PropTypes.number.isRequired
   },
   onChange: function(key, value) {
     var data = {
@@ -234,11 +278,17 @@ var InitGMCharacterRow = React.createClass({displayName: 'InitGMCharacterRow',
   onShowHPChange: function(ev) {
     this.onChange('showHP', ev.target.checked);
   },
+  onClone: function() {
+    this.props.socket.emit('cloneCharacter', {key: this.props.key});
+  },
+  onDelete: function() {
+    this.props.socket.emit('deleteCharacter', {key: this.props.key});
+  },
   render: function() {
     var data = this.props.data;
     return <tr>
-      <td><input ref="name" value={data.name} onChange={this.onNameChange} /></td>
-      <td><input ref="displayName" value={data.displayName} onChange={this.onDisplayNameChange} /></td>
+      <td><input ref="name" value={data.name} onChange={this.onNameChange} size="10" /></td>
+      <td><input ref="displayName" value={data.displayName} onChange={this.onDisplayNameChange} size="10" /></td>
       <td>
         <select ref="type" value={data.type} onChange={this.onTypeChange} >
           <option value="PC">PC</option>
@@ -246,19 +296,22 @@ var InitGMCharacterRow = React.createClass({displayName: 'InitGMCharacterRow',
           <option value="ENEMY">ENEMY</option>
         </select>
       </td>
-      <td><input ref="initRoll" value={data.initRoll} onChange={this.onInitRollChange} /></td>
-      <td><input ref="initBonus" value={data.initBonus} onChange={this.onInitBonusChange} /></td>
-      <td><input ref="initRand" value={data.initRand} onChange={this.onInitRandChange} /></td>
-      <td><input ref="hpDamageStr" value={data.hpDamageStr} onChange={this.onHPDamageStrChange} /></td>
-      <td><input ref="hpDamage" value={data.hpDamage} onChange={this.onHPDamageChange} /></td>
-      <td><input ref="hpMax" value={data.hpMax} onChange={this.onHPMaxChange} /></td>
-      <td><input ref="tags" value={data.tags} onChange={this.onTagsChange} /></td>
+      <td><input ref="initRoll" value={data.initRoll} onChange={this.onInitRollChange} size="1" /></td>
+      <td><input ref="initBonus" value={data.initBonus} onChange={this.onInitBonusChange} size="1" /></td>
+      <td><input ref="initRand" value={data.initRand} onChange={this.onInitRandChange} size="1" /></td>
+      <td><input ref="hpDamageStr" value={data.hpDamageStr} onChange={this.onHPDamageStrChange} size="10" /></td>
+      <td><input ref="hpDamage" value={data.hpDamage} onChange={this.onHPDamageChange} size="1" /></td>
+      <td><input ref="hpMax" value={data.hpMax} onChange={this.onHPMaxChange} size="1" /></td>
+      <td><input ref="tags" value={data.tags} onChange={this.onTagsChange} size="10" /></td>
       <td><input type="checkbox" ref="involved" checked={data.involved} onChange={this.onInvolvedChange} /></td>
       <td><input type="checkbox" ref="showChar" checked={data.showChar} onChange={this.onShowCharChange} /></td>
       <td><input type="checkbox" ref="showInit" checked={data.showInit} onChange={this.onShowInitChange} /></td>
       <td><input type="checkbox" ref="showDamage" checked={data.showDamage} onChange={this.onShowDamageChange} /></td>
       <td><input type="checkbox" ref="showHP" checked={data.showHP} onChange={this.onShowHPChange} /></td>
-      <td></td>
+      <td>
+        <button onClick={this.onClone}>Clone</button>
+        <button onClick={this.onDelete}>Delete</button>
+      </td>
     </tr>;
   }
 });

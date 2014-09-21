@@ -117,22 +117,66 @@ var InitGMCharacterInfo = React.createClass({displayName: 'InitGMCharacterInfo',
   propTypes: {
     socket: React.PropTypes.object.isRequired,
   },
+  getInitialState: function() {
+    return {
+      involvedOnly: false,
+    };
+  },
   onAddCharacter: function(e) {
     this.props.socket.emit('addCharacter');
   },
   onRollInit: function(e) {
     this.props.socket.emit('rollInit');
   },
+  onInvolvedOnlyChange: function(e) {
+    this.setState({
+      involvedOnly: e.target.checked,
+    });
+  },
+  onSortInitChange: function(e) {
+    this.setState({
+      sortInit: e.target.checked,
+    });
+  },
   render: function() {
-    var rows = [];
+    var chars = [];
     for (var key in this.props.characters) {
+      if (!this.state.involvedOnly || this.props.characters[key].involved) {
+        chars.push(this.props.characters[key]);
+      }
+    }
+    if (this.state.sortInit) {
+      chars = chars.sort(function (a, b) {
+        if (a.initRoll + a.initBonus != b.initRoll + b.initBonus) {
+          return (b.initRoll + b.initBonus) - (a.initRoll + a.initBonus);
+        }
+
+        if (a.initBonus != b.initBonus) {
+          return b.initBonus - a.initBonus;
+        }
+
+        return b.initRand - a.initRand;
+      });
+
+      if (this.props.room.currentChar != null) {
+        for (var i = 0; i < chars.length; i++) {
+          if (this.props.room.currentChar == chars[i].key) {
+            chars = chars.slice(i).concat(chars.slice(0,i));
+          }
+        }
+      }
+    }
+    var rows = [];
+    for (var i = 0; i < chars.length; i++) {
       rows.push(
-        InitGMCharacterRow({socket: this.props.socket, data: this.props.characters[key], key: key})
+        InitGMCharacterRow({socket: this.props.socket, data: chars[i], key: chars[i].key})
       );
     }
     return React.DOM.div({id: "gmCharacterInfo"}, 
       React.DOM.button({onClick: this.onAddCharacter}, "Add Character"), 
       React.DOM.button({onClick: this.onRollInit}, "Roll Init"), 
+      React.DOM.label(null, "Show Involved Only", React.DOM.input({type: "checkbox", onChange: this.onInvolvedOnlyChange, checked: this.state.involvedOnly})), 
+      React.DOM.label(null, "Sort Characters", React.DOM.input({type: "checkbox", onChange: this.onSortInitChange, checked: this.state.sortInit})), 
       React.DOM.table(null, 
         React.DOM.tr(null, 
           React.DOM.th(null, "Name"), 
@@ -178,7 +222,7 @@ var InitGMCharacterRow = React.createClass({displayName: 'InitGMCharacterRow',
       showDamage: React.PropTypes.bool,
       showHP: React.PropTypes.bool
     }).isRequired,
-    key: React.PropTypes.string.isRequired
+    key: React.PropTypes.number.isRequired
   },
   onChange: function(key, value) {
     var data = {
@@ -234,11 +278,17 @@ var InitGMCharacterRow = React.createClass({displayName: 'InitGMCharacterRow',
   onShowHPChange: function(ev) {
     this.onChange('showHP', ev.target.checked);
   },
+  onClone: function() {
+    this.props.socket.emit('cloneCharacter', {key: this.props.key});
+  },
+  onDelete: function() {
+    this.props.socket.emit('deleteCharacter', {key: this.props.key});
+  },
   render: function() {
     var data = this.props.data;
     return React.DOM.tr(null, 
-      React.DOM.td(null, React.DOM.input({ref: "name", value: data.name, onChange: this.onNameChange})), 
-      React.DOM.td(null, React.DOM.input({ref: "displayName", value: data.displayName, onChange: this.onDisplayNameChange})), 
+      React.DOM.td(null, React.DOM.input({ref: "name", value: data.name, onChange: this.onNameChange, size: "10"})), 
+      React.DOM.td(null, React.DOM.input({ref: "displayName", value: data.displayName, onChange: this.onDisplayNameChange, size: "10"})), 
       React.DOM.td(null, 
         React.DOM.select({ref: "type", value: data.type, onChange: this.onTypeChange}, 
           React.DOM.option({value: "PC"}, "PC"), 
@@ -246,19 +296,22 @@ var InitGMCharacterRow = React.createClass({displayName: 'InitGMCharacterRow',
           React.DOM.option({value: "ENEMY"}, "ENEMY")
         )
       ), 
-      React.DOM.td(null, React.DOM.input({ref: "initRoll", value: data.initRoll, onChange: this.onInitRollChange})), 
-      React.DOM.td(null, React.DOM.input({ref: "initBonus", value: data.initBonus, onChange: this.onInitBonusChange})), 
-      React.DOM.td(null, React.DOM.input({ref: "initRand", value: data.initRand, onChange: this.onInitRandChange})), 
-      React.DOM.td(null, React.DOM.input({ref: "hpDamageStr", value: data.hpDamageStr, onChange: this.onHPDamageStrChange})), 
-      React.DOM.td(null, React.DOM.input({ref: "hpDamage", value: data.hpDamage, onChange: this.onHPDamageChange})), 
-      React.DOM.td(null, React.DOM.input({ref: "hpMax", value: data.hpMax, onChange: this.onHPMaxChange})), 
-      React.DOM.td(null, React.DOM.input({ref: "tags", value: data.tags, onChange: this.onTagsChange})), 
+      React.DOM.td(null, React.DOM.input({ref: "initRoll", value: data.initRoll, onChange: this.onInitRollChange, size: "1"})), 
+      React.DOM.td(null, React.DOM.input({ref: "initBonus", value: data.initBonus, onChange: this.onInitBonusChange, size: "1"})), 
+      React.DOM.td(null, React.DOM.input({ref: "initRand", value: data.initRand, onChange: this.onInitRandChange, size: "1"})), 
+      React.DOM.td(null, React.DOM.input({ref: "hpDamageStr", value: data.hpDamageStr, onChange: this.onHPDamageStrChange, size: "10"})), 
+      React.DOM.td(null, React.DOM.input({ref: "hpDamage", value: data.hpDamage, onChange: this.onHPDamageChange, size: "1"})), 
+      React.DOM.td(null, React.DOM.input({ref: "hpMax", value: data.hpMax, onChange: this.onHPMaxChange, size: "1"})), 
+      React.DOM.td(null, React.DOM.input({ref: "tags", value: data.tags, onChange: this.onTagsChange, size: "10"})), 
       React.DOM.td(null, React.DOM.input({type: "checkbox", ref: "involved", checked: data.involved, onChange: this.onInvolvedChange})), 
       React.DOM.td(null, React.DOM.input({type: "checkbox", ref: "showChar", checked: data.showChar, onChange: this.onShowCharChange})), 
       React.DOM.td(null, React.DOM.input({type: "checkbox", ref: "showInit", checked: data.showInit, onChange: this.onShowInitChange})), 
       React.DOM.td(null, React.DOM.input({type: "checkbox", ref: "showDamage", checked: data.showDamage, onChange: this.onShowDamageChange})), 
       React.DOM.td(null, React.DOM.input({type: "checkbox", ref: "showHP", checked: data.showHP, onChange: this.onShowHPChange})), 
-      React.DOM.td(null)
+      React.DOM.td(null, 
+        React.DOM.button({onClick: this.onClone}, "Clone"), 
+        React.DOM.button({onClick: this.onDelete}, "Delete")
+      )
     );
   }
 });

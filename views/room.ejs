@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Room: <%= roomName %></title>
+<link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" type="text/css" href="/style/style.css">
+<script src="/js/react-with-addons-0.11.1.js"></script>
+<script src="/js/tpl.js"></script>
+<script src="/js/jquery-2.1.1.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+  $(function() {
+    var socket = io.connect();
+    var roomName = '<%= roomName %>';
+    var page = InitPage({roomName:roomName, socket: socket});
+    React.renderComponent(
+      page,
+      document.getElementsByTagName('body')[0]
+    );
+  });
+</script>
+</head>
+<body>
+</body>
+</html>
