@@ -1,0 +1,10 @@
+{
+  "name": "rpginit",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "4.9.x",
+    "socket.io": "1.1.x",
+    "validator": "3.18.x"
+  }
+}

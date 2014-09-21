@@ -1,0 +1,128 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+body {
+  background: url('/images/bg.png');
+  font-family: 'PT Sans', sans-serif;
+}
+#currentInitiative {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 600px;
+  color: #FFDDDD;
+  z-index: -1;
+  overflow: hidden;
+}
+#campaignHeader {
+  font-size: 28px;
+  font-style: italic;
+  color: #AAAAAA;
+  margin: 15px;
+}
+#campaignHeader .campaign {
+  color: #333333;
+}
+.initTable {
+  margin: 20px 40px;
+  font-size: 32px;
+}
+.initTable .active {
+  font-size: 56px;
+  font-weight: bold;
+}
+.initTable .initRow {
+  display: block;
+  clear: both;
+}
+.initTable .initRow div {
+  margin: 0 20px 10px 0;
+  float: left;
+}
+.initTable .initRow.active {
+  margin: 0 0 20px 0;
+  float: left;
+}
+.initTable .initRow.bloodied {
+  color: #FF9900;
+}
+.initTable .initRow.unconcious {
+  color: #FF0000;
+}
+.initTable .initRow.dead div {
+  color: #CCCCCC;
+  font-style: italic;
+}
+.initTable .charInit {
+  width: 50px;
+}
+.initTable .charName {
+}
+.initTable .charTags {
+  font-style: italic;
+  color: #999999;
+}
+.initTable .health {
+}
+.initTable .damage {
+}
+.initTable .active .charInit {
+  width: 100px;
+}
+
+#gmCharacterInfo table, #gmCharacterInfo td, #gmCharacterInfo th {
+  border: 1px solid #000000;
+}
+
+#gmCharacterInfo th {
+  font-weight: bold;
+}
+
+#gmCharacterInfo td, #gmCharacterInfo th {
+  padding: 3px;
+}
