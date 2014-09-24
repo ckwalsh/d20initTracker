@@ -169,7 +169,7 @@ var InitGMCharacterInfo = React.createClass({displayName: 'InitGMCharacterInfo',
     var rows = [];
     for (var i = 0; i < chars.length; i++) {
       rows.push(
-        <InitGMCharacterRow socket={this.props.socket} data={chars[i]} key={chars[i].key} />
+        <InitGMCharacterRow socket={this.props.socket} data={chars[i]} key={chars[i].key} room={this.props.room} />
       );
     }
     return <div id="gmCharacterInfo">
@@ -278,6 +278,9 @@ var InitGMCharacterRow = React.createClass({displayName: 'InitGMCharacterRow',
   onShowHPChange: function(ev) {
     this.onChange('showHP', ev.target.checked);
   },
+  onSetCurrentChar: function() {
+    this.props.socket.emit('mutateRoom', {currentChar: this.props.key});
+  },
   onClone: function() {
     this.props.socket.emit('cloneCharacter', {key: this.props.key});
   },
@@ -286,7 +289,12 @@ var InitGMCharacterRow = React.createClass({displayName: 'InitGMCharacterRow',
   },
   render: function() {
     var data = this.props.data;
-    return <tr>
+    var cx = React.addons.classSet;
+    var cm = {
+      currentChar: data.key == this.props.room.currentChar,
+    };
+
+    return <tr className={cx(cm)}>
       <td><input ref="name" value={data.name} onChange={this.onNameChange} size="10" /></td>
       <td><input ref="displayName" value={data.displayName} onChange={this.onDisplayNameChange} size="10" /></td>
       <td>
@@ -309,6 +317,7 @@ var InitGMCharacterRow = React.createClass({displayName: 'InitGMCharacterRow',
       <td><input type="checkbox" ref="showDamage" checked={data.showDamage} onChange={this.onShowDamageChange} /></td>
       <td><input type="checkbox" ref="showHP" checked={data.showHP} onChange={this.onShowHPChange} /></td>
       <td>
+        <button onClick={this.onSetCurrentChar}>Make Current Actor</button>
         <button onClick={this.onClone}>Clone</button>
         <button onClick={this.onDelete}>Delete</button>
       </td>

@@ -20,6 +20,6 @@ app.use(express.static('public'));
 var rm = new RoomManager();
 var ssh = new SocketServerHandler(io, rm);
 
-server.listen(3000, function() {
+server.listen(8081, 'localhost', function() {
   console.log('Listening on port %d', server.address().port);
 });

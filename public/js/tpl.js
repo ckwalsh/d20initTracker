@@ -71,7 +71,7 @@ var InitCurrentInit = React.createClass({displayName: 'InitCurrentInit',displayn
     var currentInit = '';
     if (this.props.room.currentChar) {
       for (var i = 0; i < this.props.characters.length; i++) {
-        if (this.props.characters[i].key === this.props.room.currentChar) {
+        if (this.props.characters[i].key == this.props.room.currentChar) {
           if (typeof this.props.characters[i].init === 'number') {
             currentInit = this.props.characters[i].init;
           }
@@ -120,7 +120,7 @@ var InitTable = React.createClass({displayName: 'InitTable',
     var rows = [];
     for (var i = 0; i < this.props.characters.length; i++) {
       var c = this.props.characters[i];
-      rows.push(InitRow({key: c.key, data: c, active: c.key === this.props.room.currentChar}));
+      rows.push(InitRow({key: c.key, data: c, active: c.key == this.props.room.currentChar}));
     };
     return (
       React.DOM.div({className: "initTable"}, 

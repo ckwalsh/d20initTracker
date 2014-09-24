@@ -126,3 +126,7 @@ body {
 #gmCharacterInfo td, #gmCharacterInfo th {
   padding: 3px;
 }
+
+#gmCharacterInfo .currentChar {
+  background-color: #FFCCCC;
+}
